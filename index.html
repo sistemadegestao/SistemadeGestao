@@ -383,7 +383,7 @@
               <option value="excelente">Excelente</option>
               <option value="intermediária">Intermediária</option>
               <option value="doente">Doente</option>
-              <option value="estado grave">Estado Grave</option>
+              <option value="estado_grave">Estado Grave</option>
             </select>
           </div>
           <div class="col-md-2 d-flex align-items-end">
@@ -432,7 +432,7 @@
 
   <!-- Modal de confirmação de exclusão -->
   <div class="modal fade" id="modalExcluir" tabindex="-1" aria-labelledby="modalExcluirLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="modalExcluirLabel">Confirmação de Exclusão</h5>
@@ -451,7 +451,7 @@
 
   <!-- Modal de edição -->
   <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="modalEditarLabel">Editar Animal</h5>
@@ -490,7 +490,7 @@
                 <option value="excelente">Excelente</option>
                 <option value="intermediária">Intermediária</option>
                 <option value="doente">Doente</option>
-                <option value="estado grave">Estado Grave</option>
+                <option value="estado_grave">Estado Grave</option>
               </select>
             </div>
             <button type="submit" class="btn btn-primary">Salvar Alterações</button>
@@ -695,7 +695,6 @@
       atualizarTabela();
       atualizarGrafico();
       mostrarMensagem('success', 'Animal cadastrado com sucesso!');
-      location.reload();
       this.reset();
       atualizarVacas();
     });
