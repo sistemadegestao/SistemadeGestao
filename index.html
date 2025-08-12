@@ -1,0 +1,1468 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1024, initial-scale=0.78, maximum-scale=0.78" />
+  <title>Gerenciamento de Gado</title>
+  <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/128/6024/6024289.png" type="image/x-icon" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+
+  <style>
+    body {
+      -webkit-text-size-adjust: 100%;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: #f5f7fa;
+      display: flex;
+      flex-direction: row;
+      overflow-x: hidden;
+    }
+
+
+
+
+    aside {
+      width: 260px;
+      background: #1e7e34;
+      color: #fff;
+      padding: 2rem 1.5rem;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      z-index: 1030;
+      transition: transform 0.3s ease;
+    }
+
+
+
+
+    aside.active {
+      transform: translateX(0); /* Exibir a barra lateral quando ativa */
+    }
+
+
+
+
+    aside h2 {
+      font-weight: 700;
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+      margin-top: 2.5rem; /* Ajusta a posição para empurrar mais para baixo */
+      letter-spacing: 1.2px;
+      user-select: none;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    }
+
+
+
+
+    aside .nav-link {
+      color: #e2f0d9;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.4rem;
+      transition: background 0.25s, color 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+
+
+
+    aside .nav-link:hover, aside .nav-link:focus {
+      background: #145c22;
+      color: #cdeac0;
+      text-decoration: none;
+      box-shadow: inset 3px 0 0 #ffc107;
+    }
+
+
+
+
+    main {
+      margin-left: 260px; /* Espaço reservado para a barra lateral */
+      flex-grow: 1;
+      padding: 3rem 3rem 4rem 3rem;
+      background: white;
+      min-height: 100vh;
+      box-shadow: inset 0 0 20px #eaeaea;
+      transition: margin-left 0.3s ease;
+    }
+
+
+
+
+    @media (max-width: 767.98px) {
+      main {
+        margin-left: 0; /* Remove a margem em telas menores */
+        padding: 1.5rem 1.5rem 3rem 1.5rem;
+      }
+
+
+
+
+      aside {
+        transform: translateX(-100%); /* Esconder a barra lateral em dispositivos móveis */
+      }
+
+
+
+
+      aside.active {
+        transform: translateX(0); /* Mostrar a barra lateral quando ativa em dispositivos móveis */
+      }
+    }
+
+
+
+
+    #btnToggleSidebar {
+      display: none; /* Ocultar por padrão */
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      z-index: 1100;
+      background: #1e7e34;
+      border: none;
+      color: white;
+      padding: 0.4rem 0.6rem;
+      border-radius: 0.3rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      transition: background 0.3s;
+    }
+
+
+
+
+    #btnToggleSidebar:hover {
+      background: #145c22;
+    }
+
+
+
+
+    @media (max-width: 767.98px) {
+      #btnToggleSidebar {
+        display: block; /* Mostrar apenas em dispositivos móveis */
+      }
+    }
+
+
+
+
+    h1 {
+      font-weight: 700;
+      color: #1e7e34;
+      text-align: center;
+      margin-bottom: 2.5rem;
+      letter-spacing: 0.05em;
+      user-select: none;
+    }
+
+
+
+
+    #formCadastro .form-label {
+      font-weight: 600;
+      color: #333;
+      user-select: none;
+    }
+
+
+
+
+    #formCadastro .form-control,
+    #formCadastro .form-select {
+      border-radius: 0.4rem;
+      border: 1.5px solid #ccc;
+      transition: border-color 0.3s;
+      font-size: 1rem;
+      padding: 0.4rem 0.6rem;
+    }
+
+
+
+
+    #formCadastro .form-control:focus,
+    #formCadastro .form-select:focus {
+      border-color: #198754;
+      box-shadow: 0 0 8px rgba(25, 135, 84, 0.4);
+      outline: none;
+    }
+
+
+
+
+    #formCadastro button {
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.5rem 1.2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(25,135,84,0.4);
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+
+
+
+
+    #formCadastro button:hover {
+      background-color: #146c2b;
+      box-shadow: 0 6px 10px rgba(20,108,43,0.6);
+    }
+
+
+
+
+    @media (max-width: 575.98px) {
+      #formCadastro .col-md-2,
+      #formCadastro .col-md-4 {
+        flex: 1 0 100% !important;
+      }
+    }
+
+
+
+
+    table.dataTable {
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+      font-size: 0.9rem;
+    }
+
+
+
+
+    table.dataTable thead th {
+      background-color: #198754;
+      color: white;
+      font-weight: 600;
+      user-select: none;
+    }
+
+
+
+
+    table.dataTable tbody tr:hover {
+      background-color: #d9f7be !important;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+
+
+
+    table.dataTable tbody td {
+      vertical-align: middle;
+    }
+
+
+
+
+    .btn-danger {
+      background-color: #dc3545;
+      border-color: #dc3545;
+      transition: background-color 0.3s ease;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.9rem;
+    }
+
+
+
+
+    .btn-danger:hover {
+      background-color: #a72c37;
+      border-color: #a72c37;
+    }
+
+
+
+
+    .table-responsive {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+
+
+
+    #graficos {
+      margin-top: 3rem;
+      background: #e6f4ea;
+      border-radius: 0.6rem;
+      padding: 1.5rem 1.8rem;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+    }
+
+
+
+
+    #graficos h4 {
+      color: #145c22;
+      font-weight: 600;
+      margin-bottom: 1.2rem;
+      user-select: none;
+      text-align: center;
+    }
+
+
+
+
+    #graficoTipo {
+      max-width: 400px;
+      margin: 0 auto;
+      display: block;
+    }
+
+
+
+
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+      transition: opacity 0.5s;
+    }
+
+
+
+
+    .modal-header {
+      background-color: #198754;
+      color: white;
+    }
+
+
+
+
+    /* Estilos para o status */
+    .status-ativo {
+      color: green;
+      font-weight: bold;
+    }
+
+
+
+
+    .status-vendido {
+      color: rgb(255, 0, 0);
+      font-weight: bold;
+    }
+
+
+
+
+    .status-obito {
+      color: yellow; /* Alterado para amarelo */
+      font-weight: bold;
+    }
+
+
+
+
+    /* Estilos para as contagens de gado */
+    .contador-gado {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+
+
+
+    .contador {
+      margin: 0 15px;
+      text-align: center;
+      font-size: 1.2rem; /* Diminuindo a fonte */
+      font-weight: bold;
+    }
+
+
+
+
+    /* Estilos para o balão de filtro */
+    .dataTables_filter {
+      margin-bottom: 1rem;
+    }
+
+
+
+
+    .dataTables_filter input {
+      border-radius: 0.4rem;
+      border: 1.5px solid #198754;
+      padding: 0.4rem;
+      transition: border-color 0.3s;
+      width: 250px;
+    }
+
+
+
+
+    .dataTables_filter input:focus {
+      border-color: #145c22;
+      box-shadow: 0 0 8px rgba(20, 108, 43, 0.4);
+      outline: none;
+    }
+
+
+
+
+    .dataTables_filter label {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #333;
+    }
+  
+/* Melhorias para centralização de modais em dispositivos móveis */
+@media (max-width: 767.98px) {
+  .modal-dialog {
+    margin: 0 auto;
+    max-width: 95%;
+    width: auto;
+  }
+  .modal-content {
+    border-radius: 10px;
+    padding: 10px;
+  }
+  .modal-header, .modal-body, .modal-footer {
+    text-align: center;
+  }
+}
+
+/* Ajuste para telas muito pequenas */
+@media (max-width: 480px) {
+  .modal-dialog {
+    max-width: 98%;
+  }
+  .modal-body form .form-control,
+  .modal-body form .form-select {
+    font-size: 16px; /* Melhor leitura em mobile */
+  }
+  .modal-footer button {
+    font-size: 16px;
+    padding: 10px;
+  }
+}
+
+
+/* Aumentar fontes e elementos para mobile sem mudar zoom/width */
+@media (max-width: 767.98px) {
+  body, table, input, select, button, label, h1, h2, h3, h4, h5, h6, p, .nav-link {
+    font-size: 1.2rem !important;
+  }
+  aside {
+    width: 300px !important;
+    padding: 2.5rem 2rem !important;
+  }
+  aside h2 {
+    font-size: 2rem !important;
+  }
+  aside .nav-link {
+    font-size: 1.3rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+  #btnToggleSidebar {
+    font-size: 2rem !important;
+    padding: 0.6rem 1rem !important;
+  }
+  #formCadastro .form-control, #formCadastro .form-select {
+    font-size: 1.1rem !important;
+    padding: 0.6rem 0.8rem !important;
+  }
+  table.dataTable {
+    font-size: 1rem !important;
+  }
+  .contador {
+    font-size: 1.4rem !important;
+  }
+  .btn {
+    font-size: 1.1rem !important;
+    padding: 0.6rem 1rem !important;
+  }
+}
+
+/* Ajuste extra para telas muito pequenas */
+@media (max-width: 480px) {
+  body, table, input, select, button, label, h1, h2, h3, h4, h5, h6, p, .nav-link {
+    font-size: 1.3rem !important;
+  }
+  aside {
+    width: 320px !important;
+  }
+}
+
+</style>
+
+<!-- Responsive modal centering fixes for mobile (applied professionally) -->
+<style>
+/* Use fixed positioning and flex centering for dialogs on small screens */
+@media (max-width: 992px) {
+  .modal {
+    display: block; /* ensure it's rendered for positioning calculations */
+  }
+  .modal-dialog {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    width: 95% !important;
+    max-width: 720px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  .modal-dialog.modal-xl {
+    max-width: 95% !important;
+    padding: 0 8px;
+  }
+  .modal-content {
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 12px;
+  }
+  .modal-header, .modal-body, .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  /* Make buttons stack nicely on very small widths */
+  .modal-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .modal-footer .btn {
+    width: 100%;
+  }
+}
+
+/* Extra small devices: ensure inputs are comfortable touch targets */
+@media (max-width: 420px) {
+  .modal-dialog {
+    width: 98% !important;
+    max-width: 98% !important;
+  }
+  .modal-body .form-control, .modal-body .form-select {
+    font-size: 16px;
+    padding: 12px;
+  }
+  .modal-header .btn-close {
+    transform: scale(1.1);
+  }
+}
+
+/* Improve backdrop handling so modal appears centered visually */
+.modal-backdrop.show {
+  opacity: 0.45;
+}
+
+/* Ensure modals scroll inside viewport rather than pushing content */
+html.modal-open {
+  height: 100%;
+  overflow: hidden;
+}
+</style>
+
+</head>
+<body>
+  <button id="btnToggleSidebar" aria-label="Abrir menu">
+    <i class="bi bi-list"></i>
+  </button>
+
+
+
+
+  <aside id="sidebar" role="navigation" aria-label="Menu principal">
+    <h2>Gestão de Gado</h2>
+    <nav class="nav flex-column">
+      <a class="nav-link" href="#cadastro" title="Ir para cadastro">🐮 Cadastro</a>
+      <a class="nav-link" href="#tabela" title="Ir para tabela">📋 Tabela</a>
+      <a class="nav-link" href="#graficos" title="Ir para gráficos">📊 Gráficos</a>
+      <a class="nav-link" href="#" onclick="imprimir()" title="Imprimir tabela">🖨 Imprimir</a>
+      <a class="nav-link" href="#" onclick="exportarExcel()" title="Exportar para Excel">📥 Exportar Excel</a>
+    </nav>
+  </aside>
+
+
+
+
+  <main role="main">
+    <div class="container-fluid">
+      <h1>Sistema de Gestão de Gado</h1>
+
+
+
+
+      <section id="cadastro" aria-label="Formulário de cadastro de animais">
+        <form id="formCadastro" class="row g-3 mb-5" autocomplete="off">
+          <div class="col-md-2">
+            <label class="form-label" for="tipoAnimal">Tipo</label>
+            <select class="form-select" name="tipo" id="tipoAnimal" required onchange="atualizarVacas(); atualizarVacaMaeVisibility();">
+              <option value="vaca">Vaca</option>
+              <option value="bezerro">Bezerro</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label" for="numero">Número</label>
+            <input type="text" class="form-control" name="numero" id="numero" required />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label" for="nascimento">Nascimento</label>
+            <input type="date" class="form-control" name="nascimento" id="nascimento" required />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label" for="peso">Peso (kg)</label>
+            <input type="number" class="form-control" name="peso" id="peso" required min="1" />
+          </div>
+          <div class="col-md-2">
+            <label class="form-label" for="genero">Sexo</label>
+            <select class="form-select" name="genero" id="genero" required>
+              <option value="macho">Macho</option>
+              <option value="fêmea">Fêmea</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label" for="status">Status</label>
+            <select class="form-select" name="status" id="status" required>
+              <option value="ativo">Ativo(a)</option>
+              <option value="vendido">Vendido(a)</option>
+              <option value="óbito">Óbito</option>
+            </select>
+          </div>
+          <div class="col-md-4" id="divVacaMae" style="display: none;">
+            <label class="form-label" for="vacaMae">Vaca-Mãe</label>
+            <select class="form-select" name="vacaMae" id="vacaMae">
+              <option value="">Selecione uma vaca</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="eventoReprodutivo">Evento Reprodutivo</label>
+            <select class="form-select" name="eventoReprodutivo" id="eventoReprodutivo">
+              <option value="nenhum">Nenhum</option>
+              <option value="parto">Parto</option>
+              <option value="aborto">Aborto</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label" for="condicao">Condição</label>
+            <select class="form-select" name="condicao" id="condicao" required>
+              <option value="nenhum">Nenhum(a)</option>
+              <option value="excelente">Excelente</option>
+              <option value="intermediária">Intermediária</option>
+              <option value="doente">Doente</option>
+              <option value="estado_grave">Estado Grave</option>
+            </select>
+          </div>
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-success w-100" aria-label="Cadastrar animal">Cadastrar</button>
+          </div>
+        </form>
+      </section>
+
+
+
+
+      <section id="tabela" aria-label="Tabela de animais">
+        <div class="table-responsive">
+          <table id="tabelaGado" class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Número</th>
+                <th>Nascimento</th>
+                <th>Idade</th>
+                <th>Peso (Kg)</th>
+                <th>Gênero</th>
+                <th>Status</th>
+                <th>Vaca-Mãe</th>
+                <th>Evento</th>
+                <th>Condição</th>
+                <th>Editar</th>
+                <th>Histórico</th>
+                <th>Excluir</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <div id="infoFiltered" class="mt-2"></div>
+        </div>
+      </section>
+
+
+
+
+      <section id="graficos" class="mt-5" aria-label="Gráficos de distribuição">
+        <h4>Distribuição por Tipo</h4>
+        <canvas id="graficoTipo"></canvas>
+      </section>
+
+
+
+
+      <section class="contador-gado">
+        <div class="contador" id="contadorBoi">Boi: 0</div>
+        <div class="contador" id="contadorVaca">Vaca: 0</div>
+        <div class="contador" id="contadorBezerroMacho">Bezerro Macho: 0</div>
+        <div class="contador" id="contadorBezerroFemea">Bezerro Fêmea: 0</div>
+      </section>
+    </div>
+  </main>
+
+
+
+
+  <!-- Modal de confirmação de exclusão -->
+  <div class="modal fade" id="modalExcluir" tabindex="-1" aria-labelledby="modalExcluirLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalExcluirLabel">Confirmação de Exclusão</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <p>Você tem certeza que deseja excluir este animal?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary w-100 me-2" data-bs-dismiss="modal" style="padding: 10px 20px; font-size: 18px;">Cancelar</button>
+          <button type="button" class="btn btn-danger w-100" id="confirmarExcluir" style="padding: 10px 20px; font-size: 18px;">Excluir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Modal de edição -->
+  <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="modalEditarLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalEditarLabel">Editar Animal</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formEditar">
+            <div class="mb-3">
+              <label for="numeroEditar" class="form-label">Número</label>
+              <input type="text" class="form-control" id="numeroEditar" />
+            </div>
+            <div class="mb-3">
+              <label for="pesoEditar" class="form-label">Peso (kg)</label>
+              <input type="number" class="form-control" id="pesoEditar" required min="1" />
+            </div>
+            <div class="mb-3">
+              <label for="statusEditar" class="form-label">Status</label>
+              <select class="form-select" id="statusEditar" required>
+                <option value="ativo">Ativo(a)</option>
+                <option value="vendido">Vendido(a)</option>
+                <option value="óbito">Óbito</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="eventoEditar" class="form-label">Evento Reprodutivo</label>
+              <select class="form-select" id="eventoEditar">
+                <option value="nenhum">Nenhum</option>
+                <option value="parto">Parto</option>
+                <option value="aborto">Aborto</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="condicaoEditar" class="form-label">Condição</label>
+              <select class="form-select" id="condicaoEditar" required>
+                <option value="nenhum">Nenhum(a)</option>
+                <option value="excelente">Excelente</option>
+                <option value="intermediária">Intermediária</option>
+                <option value="doente">Doente</option>
+                <option value="estado_grave">Estado Grave</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Modal Histórico (integrado) -->
+  <div class="modal fade" id="modalHistorico" tabindex="-1" aria-labelledby="modalHistoricoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalHistoricoLabel">Histórico do Gado</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <ul id="listaHistorico" class="list-group mb-3" style="max-height:400px; overflow:auto;"></ul>
+            </div>
+            <div class="col-md-6">
+              <h6 id="tituloHistoricoDetalhe">Adicionar novo registro</h6>
+              <form id="formHistorico">
+                <div class="mb-3">
+                  <label for="anoHistorico" class="form-label">Ano</label>
+                  <input type="number" class="form-control" id="anoHistorico" required />
+                </div>
+                <div class="mb-3">
+                  <label for="descricaoHistorico" class="form-label">Descrição</label>
+                  <textarea class="form-control" id="descricaoHistorico" rows="6" required></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-success">Salvar</button>
+                  <button type="button" id="btnCancelarEdicaoHistorico" class="btn btn-secondary">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+    const sidebar = document.getElementById('sidebar');
+    btnToggleSidebar.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+
+
+
+
+    let dados = []; // Agora será carregado do Firestore em tempo real
+let unsubscribe = null;
+    let gadoParaExcluir = null; // Variável para armazenar o gado a ser excluído
+    let gadoParaEditar = null; // Variável para armazenar o gado a ser editado
+
+
+
+
+    function salvarLocal() {
+      if (Array.isArray(dados)) {
+        dados.forEach(item => salvarNoBanco(item));
+      }
+    }
+
+
+
+
+    function calcularIdade(dataNascimento) {
+      const nascimento = new Date(dataNascimento);
+      const hoje = new Date();
+      const diffEmMs = hoje - nascimento;
+
+
+
+
+      // Calcular os dias
+      const dias = Math.floor(diffEmMs / (1000 * 60 * 60 * 24));
+      if (dias < 30) {
+        return `${dias} dia${dias !== 1 ? 's' : ''}`; // Retorna dias
+      }
+
+
+
+
+      // Calcular os meses
+      const meses = Math.floor(dias / 30);
+      if (meses < 12) {
+        return `${meses} mes${meses !== 1 ? 'es' : ''}`; // Retorna meses
+      }
+
+
+
+
+      // Calcular anos
+      const anos = hoje.getFullYear() - nascimento.getFullYear();
+      return `${anos} ano${anos !== 1 ? 's' : ''}`; // Retorna anos
+    }
+
+
+
+
+    function formatarData(data) {
+      const partes = data.split("-");
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+
+
+
+
+    // ---------- HISTÓRICO (INTEGRAÇÃO) ----------
+    let gadoSelecionadoHistorico = null;
+    let indiceHistoricoEmEdicao = null; // null quando criando novo, número quando editando
+
+
+    function abrirHistorico(numero) {
+      gadoSelecionadoHistorico = dados.find(d => d.numero === numero);
+      if (!gadoSelecionadoHistorico) {
+        mostrarMensagem('danger', 'Gado não encontrado.');
+        return;
+      }
+      if (!Array.isArray(gadoSelecionadoHistorico.historico)) {
+        gadoSelecionadoHistorico.historico = [];
+      }
+      indiceHistoricoEmEdicao = null;
+      limparFormularioHistorico();
+      renderHistorico();
+      const modal = new bootstrap.Modal(document.getElementById('modalHistorico'));
+      modal.show();
+      document.getElementById('tituloHistoricoDetalhe').innerText = `Histórico do Gado: ${gadoSelecionadoHistorico.numero}`;
+    }
+
+
+    function renderHistorico() {
+      const lista = document.getElementById('listaHistorico');
+      lista.innerHTML = '';
+      if (!gadoSelecionadoHistorico || !Array.isArray(gadoSelecionadoHistorico.historico)) return;
+      // Ordena por ano descendente (mais recente primeiro)
+      const historicosOrdenados = [...gadoSelecionadoHistorico.historico].sort((a,b) => b.ano - a.ano);
+      historicosOrdenados.forEach((h, idx) => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-start';
+        li.innerHTML = `
+          <div>
+            <div><strong>Ano:</strong> ${h.ano}</div>
+            <div style="white-space:pre-wrap;">${h.descricao}</div>
+          </div>
+          <div class="d-flex flex-column gap-1">
+            <button class="btn btn-sm btn-warning" onclick="iniciarEdicaoHistorico(${idx})" title="Editar"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="removerHistorico(${idx})" title="Excluir"><i class="bi bi-trash"></i></button>
+          </div>
+        `;
+        lista.appendChild(li);
+      });
+    }
+
+
+    function limparFormularioHistorico() {
+      document.getElementById('anoHistorico').value = '';
+      document.getElementById('descricaoHistorico').value = '';
+      document.getElementById('btnCancelarEdicaoHistorico').style.display = 'none';
+      indiceHistoricoEmEdicao = null;
+    }
+
+
+    document.getElementById('formHistorico').addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!gadoSelecionadoHistorico) {
+        mostrarMensagem('danger', 'Nenhum gado selecionado.');
+        return;
+      }
+      const ano = Number(document.getElementById('anoHistorico').value);
+      const descricao = document.getElementById('descricaoHistorico').value.trim();
+      if (!ano || !descricao) {
+        mostrarMensagem('danger', 'Preencha Ano e Descrição antes de salvar.');
+        return;
+      }
+      // Se estiver editando um índice existente, substitui
+      if (indiceHistoricoEmEdicao !== null && indiceHistoricoEmEdicao >= 0) {
+        gadoSelecionadoHistorico.historico[indiceHistoricoEmEdicao] = { ano, descricao };
+        mostrarMensagem('success', 'Histórico atualizado com sucesso.');
+      } else {
+        // adicionar novo
+        gadoSelecionadoHistorico.historico.push({ ano, descricao });
+        mostrarMensagem('success', 'Registro histórico adicionado.');
+      }
+      salvarLocal();
+      renderHistorico();
+      limparFormularioHistorico();
+    });
+
+
+    document.getElementById('btnCancelarEdicaoHistorico').addEventListener('click', function() {
+      limparFormularioHistorico();
+    });
+
+
+    function iniciarEdicaoHistorico(idx) {
+      // mostra os dados no formulário para edição
+      const registro = gadoSelecionadoHistorico.historico[idx];
+      if (!registro) return;
+      document.getElementById('anoHistorico').value = registro.ano;
+      document.getElementById('descricaoHistorico').value = registro.descricao;
+      indiceHistoricoEmEdicao = idx;
+      document.getElementById('btnCancelarEdicaoHistorico').style.display = 'inline-block';
+      // scroll para o formulário (opcional)
+      document.getElementById('descricaoHistorico').focus();
+    }
+
+
+    function removerHistorico(idx) {
+      gadoSelecionadoHistorico.historico.splice(idx, 1);
+      salvarLocal();
+      renderHistorico();
+      mostrarMensagem('success', 'Registro histórico excluído.');
+    }
+    // ---------- FIM HISTÓRICO ----------
+
+
+
+
+    function atualizarTabela(dadosFiltrados = dados) {
+      const tabelaBody = $("#tabelaGado tbody");
+      tabelaBody.empty();
+      dadosFiltrados.forEach((d) => {
+        if (!Array.isArray(d.historico)) d.historico = []; // garante a propriedade
+        const generoExibido = d.genero === "fêmea" ? (d.tipo === "bezerro" ? "Bezerra" : "Vaca") : (d.tipo === "bezerro" ? "Bezerro" : "Boi");
+        const idade = calcularIdade(d.nascimento); // Calcular idade
+        const btnEditar = `<button class="btn btn-warning btn-sm" onclick="prepararEdicao('${d.numero}')" aria-label="Editar animal"><i class="bi bi-pencil"></i></button>`;
+        const btnHistorico = `<button class="btn btn-info btn-sm" onclick="abrirHistorico('${d.numero}')" aria-label="Ver histórico do animal"><i class="bi bi-journal-text"></i></button>`;
+       
+        // Aplicar a classe de status baseado no estado
+        let statusClass = "";
+        if (d.status === "ativo") {
+          statusClass = "status-ativo";
+        } else if (d.status === "vendido") {
+          statusClass = "status-vendido";
+        } else if (d.status === "óbito") {
+          statusClass = "status-obito";
+        }
+
+
+
+
+        const timestamp = d.nascimento ? new Date(d.nascimento).getTime() : 0;
+        const diasIdade = d.nascimento ? Math.floor((new Date() - new Date(d.nascimento))/(1000*60*60*24)) : 0;
+        const row = `<tr>
+          <td data-order="${d.numero}">${d.numero}</td>
+          <td data-order="${timestamp}">${formatarData(d.nascimento)}</td>
+          <td data-order="${diasIdade}">${idade}</td>
+          <td data-order="${d.peso}">${d.peso}</td>
+          <td data-order="${generoExibido}">${generoExibido}</td>
+          <td class="${statusClass}" data-order="${d.status}">${d.status}</td>
+          <td data-order="${d.vacaMae || '-'}">${d.vacaMae || '-'}</td>
+          <td data-order="${d.eventoReprodutivo || '-'}">${d.eventoReprodutivo || '-'}</td>
+          <td data-order="${d.condicao || '-'}">${d.condicao || '-'}</td>
+          <td class="text-center">${btnEditar}</td>
+          <td class="text-center">${btnHistorico}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="prepararExclusao('${d.numero}')" aria-label="Excluir animal"><i class="bi bi-trash"></i></button></td>
+        </tr>`;
+        tabelaBody.append(row);
+      });
+
+
+
+
+      // Atualiza a contagem de itens filtrados
+      document.getElementById('infoFiltered').innerText = `Total de ${dadosFiltrados.length} itens`;
+
+
+
+
+      atualizarContadores(); // Atualiza contadores após atualizar a tabela
+    }
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    function prepararEdicao(numero) {
+      gadoParaEditar = dados.find(d => d.numero === numero);
+      if (gadoParaEditar) {
+        $('#numeroEditar').val(gadoParaEditar.numero);
+        $('#pesoEditar').val(gadoParaEditar.peso);
+        $('#statusEditar').val(gadoParaEditar.status);
+        $('#eventoEditar').val(gadoParaEditar.eventoReprodutivo);
+        $('#condicaoEditar').val(gadoParaEditar.condicao);
+        const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
+        modalEditar.show();
+      }
+    }
+
+
+
+
+    $('#formEditar').on('submit', function (e) {
+      e.preventDefault();
+      const novoNumero = $('#numeroEditar').val().trim();
+      if (!novoNumero) { mostrarMensagem('danger', 'Número não pode ser vazio.'); return; }
+      const numeroAntigo = gadoParaEditar.numero;
+      if (novoNumero !== numeroAntigo && dados.some(x => x.numero === novoNumero)) {
+        mostrarMensagem('danger', 'Número já existe. Use outro número.');
+        return;
+      }
+      gadoParaEditar.numero = novoNumero;
+      gadoParaEditar.peso = $('#pesoEditar').val();
+      gadoParaEditar.status = $('#statusEditar').val();
+      gadoParaEditar.eventoReprodutivo = $('#eventoEditar').val();
+      gadoParaEditar.condicao = $('#condicaoEditar').val();
+      if (novoNumero !== numeroAntigo) {
+        // atualiza referências de vacaMae
+        dados.forEach(item => { if (item.vacaMae === numeroAntigo) item.vacaMae = novoNumero; });
+      }
+      salvarLocal();
+      atualizarTabela();
+      const modalEditar = bootstrap.Modal.getInstance(document.getElementById('modalEditar'));
+      modalEditar.hide();
+      mostrarMensagem('success', 'Animal editado com sucesso!');
+    });
+
+
+
+
+    function atualizarContadores() {
+      const contadores = {
+        boi: 0,
+        vaca: 0,
+        bezerroMacho: 0,
+        bezerroFemea: 0
+      };
+
+
+
+
+      dados.forEach(d => {
+        if (d.tipo === "vaca") {
+          if (d.genero === "macho") {
+            contadores.boi++; // Contar como boi
+          } else {
+            contadores.vaca++; // Contar como vaca
+          }
+        } else if (d.tipo === "bezerro") {
+          if (d.genero === "macho") {
+            contadores.bezerroMacho++; // Contar como bezerro macho
+          } else {
+            contadores.bezerroFemea++; // Contar como bezerra fêmea
+          }
+        }
+      });
+
+
+
+
+      // Atualiza os elementos de contagem
+      document.getElementById('contadorBoi').innerText = `Boi: ${contadores.boi}`;
+      document.getElementById('contadorVaca').innerText = `Vaca: ${contadores.vaca}`;
+      document.getElementById('contadorBezerroMacho').innerText = `Bezerro Macho: ${contadores.bezerroMacho}`;
+      document.getElementById('contadorBezerroFemea').innerText = `Bezerro Fêmea: ${contadores.bezerroFemea}`;
+    }
+
+
+
+
+    function prepararExclusao(numero) {
+      gadoParaExcluir = numero; // Armazenar o número do gado para exclusão
+      const modalExcluir = new bootstrap.Modal(document.getElementById('modalExcluir'));
+      modalExcluir.show();
+    }
+
+
+
+
+    document.getElementById('confirmarExcluir').addEventListener('click', function() {
+      if (gadoParaExcluir) {
+        removerDoBanco(gadoParaExcluir);
+        atualizarTabela();
+        atualizarGrafico();
+        mostrarMensagem('success', 'Animal excluído com sucesso!');
+       
+        gadoParaExcluir = null; // Limpar a variável após a exclusão
+        const modalExcluir = bootstrap.Modal.getInstance(document.getElementById('modalExcluir'));
+        modalExcluir.hide(); // Fechar o modal
+      }
+    });
+
+
+
+
+    function atualizarVacas() {
+      const vacaMaeSelect = document.getElementById('vacaMae');
+      vacaMaeSelect.innerHTML = '<option value="">Selecione uma vaca</option>';
+      const vacasDisponiveis = dados.filter(d => d.tipo === 'vaca' && d.genero === 'fêmea'); // Filtrar apenas vacas fêmeas
+      vacasDisponiveis.forEach(vaca => {
+        vacaMaeSelect.innerHTML += `<option value="${vaca.numero}">${vaca.numero}</option>`;
+      });
+    }
+
+
+
+
+    function atualizarVacaMaeVisibility() {
+      const tipoAnimalSelect = document.getElementById('tipoAnimal');
+      const vacaMaeDiv = document.getElementById('divVacaMae');
+      vacaMaeDiv.style.display = tipoAnimalSelect.value === 'bezerro' ? 'block' : 'none';
+      if (tipoAnimalSelect.value !== 'bezerro') {
+        document.getElementById('vacaMae').value = '';
+      }
+    }
+
+
+
+
+    document.addEventListener('DOMContentLoaded', atualizarVacaMaeVisibility);
+
+
+
+
+    $("#formCadastro").on("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const novo = Object.fromEntries(formData.entries());
+
+
+
+
+      if (dados.some(d => d.numero === novo.numero)) {
+        alert("Número já cadastrado. Use outro número.");
+        return;
+      }
+
+
+
+
+      if (novo.tipo === "bezerro" && novo.vacaMae) {
+        const vacaMae = dados.find(d => d.numero === novo.vacaMae);
+        if (vacaMae) {
+          novo.vacaMae = vacaMae.numero;
+        }
+      }
+
+
+      // garantir histórico
+      if (!Array.isArray(novo.historico)) {
+        novo.historico = [];
+      }
+
+
+
+
+      dados.push(novo);
+      salvarNoBanco(novo);
+      atualizarTabela();
+      atualizarGrafico();
+      mostrarMensagem('success', 'Animal cadastrado com sucesso!');
+      this.reset();
+      atualizarVacas();
+    });
+
+
+
+
+    function imprimir() {
+      window.print();
+    }
+
+
+
+
+    function exportarExcel() {
+      const dadosFormatados = dados.map(d => ({
+        "Número": d.numero,
+        "Nascimento": formatarData(d.nascimento),
+        "Idade": calcularIdade(d.nascimento), // Adicionar idade no Excel
+        "Peso (Kg)": d.peso,
+        "Gênero": d.genero === 'fêmea' ? (d.tipo === 'bezerro' ? 'Bezerra' : 'Vaca') : (d.tipo === 'bezerro' ? 'Bezerro' : 'Boi'),
+        "Status": d.status,
+        "Vaca-Mãe": d.vacaMae || "-",
+        "Evento Reprodutivo": d.eventoReprodutivo || "-",
+        "Condição": d.condicao || "-",
+        "Histórico": (d.historico && d.historico.length) ? d.historico.map(h=>`${h.ano}: ${h.descricao}`).join(' | ') : "-"
+      }));
+
+
+
+
+      const ws = XLSX.utils.json_to_sheet(dadosFormatados, { origin: "A1" });
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Gado");
+
+
+
+
+      // Autoajustar colunas
+      const larguraMaxima = dadosFormatados.reduce((larguras, obj) => {
+        Object.entries(obj).forEach(([chave, valor], i) => {
+          const largura = valor ? valor.toString().length : 10;
+          larguras[i] = Math.max(larguras[i] || chave.length, largura);
+        });
+        return larguras;
+      }, []);
+
+
+
+
+      ws["!cols"] = larguraMaxima.map(w => ({ wch: w + 2 }));
+
+
+
+
+      XLSX.writeFile(wb, "Relatorio_Gado.xlsx");
+    }
+
+
+
+
+    function atualizarGrafico() {
+      const tipos = { vaca: 0, bezerro: 0 };
+      dados.forEach(d => { tipos[d.tipo] = (tipos[d.tipo] || 0) + 1; });
+      const ctx = document.getElementById('graficoTipo').getContext('2d');
+      if (window.grafico) window.grafico.destroy();
+      window.grafico = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ["Vacas", "Bezerros"],
+          datasets: [{ data: [tipos.vaca, tipos.bezerro], backgroundColor: ["#198754", "#ffc107"] }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+
+
+
+
+    function mostrarMensagem(tipo, mensagem) {
+      const msgBox = document.createElement('div');
+      msgBox.className = `alert alert-${tipo}`;
+      msgBox.innerText = mensagem;
+      document.body.prepend(msgBox);
+      setTimeout(() => {
+        msgBox.remove();
+      }, 3000);
+    }
+
+
+
+
+    $(document).ready(function () {
+      carregarDadosTempoReal();
+      atualizarTabela();
+      atualizarGrafico();
+      $('#tabelaGado').DataTable({
+        lengthChange: false,
+        pageLength: 100,
+        info: false,
+        language: {
+          "paginate": { "previous": "Anterior", "next": "Próximo" },
+          "search": "Pesquisar:",
+          "lengthMenu": "Mostrar _MENU_ registros",
+          "zeroRecords": "Nenhum registro encontrado",
+          "infoEmpty": "Nenhum registro disponível",
+          "info": "Página _PAGE_ de _PAGES_"
+        },
+        columnDefs: [
+          { orderable: false, targets: [9, 10, 11] }
+        ],
+        pagingType: "simple"
+      });
+
+      // Plugin: order by data-order attribute (numeric when present)
+      $.fn.dataTable.ext.order['dom-data-order'] = function (settings, col) {
+        return this.api().column(col, {order:'index'}).nodes().map(function(td, i) {
+          var v = $(td).attr('data-order');
+          if (v !== undefined) return parseFloat(v);
+          return $(td).text();
+        });
+      };
+
+      // After initialization, instruct DataTables to use the custom order type for nascimento (col 1) and idade (col 2)
+      var table = $('#tabelaGado').DataTable();
+      // assign orderDataType for columns 1 (Nascimento) and 2 (Idade)
+      table.settings()[0].aoColumns = table.settings()[0].aoColumns || [];
+      table.settings()[0].aoColumns[1] = table.settings()[0].aoColumns[1] || {};
+      table.settings()[0].aoColumns[1].orderDataType = 'dom-data-order';
+      table.settings()[0].aoColumns[2] = table.settings()[0].aoColumns[2] || {};
+      table.settings()[0].aoColumns[2].orderDataType = 'dom-data-order';
+
+      // Custom search: if query mentions mes/mês/ano then require exact match on Idade column (index 2)
+      $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+        if (settings.nTable.id !== 'tabelaGado') return true;
+        var q = $('#tabelaGado_filter input').val().trim().toLowerCase();
+        if (!q) return true;
+        var ageText = (data[2] || '').toString().trim().toLowerCase();
+        if (/\bmes|mês|ano\b/.test(q)) {
+          return ageText === q;
+        }
+        return data.join(' ').toLowerCase().indexOf(q) !== -1;
+      });
+
+
+
+
+
+      // Atualiza a contagem de itens filtrados
+      $('#tabelaGado').on('draw.dt', function() {
+        const totalRegistros = $('#tabelaGado').DataTable().data().count();
+        const registrosFiltrados = $('#tabelaGado').DataTable().rows({ filter: 'applied' }).count();
+        document.getElementById('infoFiltered').innerText = `Total de ${registrosFiltrados} itens`;
+      });
+    });
+  </script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+<script>
+// Configuração Firebase (coloque as chaves reais do seu projeto)
+const firebaseConfig = {
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_DOMINIO.firebaseapp.com",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_BUCKET.appspot.com",
+  messagingSenderId: "SEU_SENDER_ID",
+  appId: "SEU_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+function carregarDadosTempoReal() {
+  if (unsubscribe) unsubscribe();
+  unsubscribe = db.collection("gado").onSnapshot(snapshot => {
+    dados = [];
+    snapshot.forEach(doc => {
+      dados.push(doc.data());
+    });
+    atualizarTabela();
+    atualizarGrafico();
+    atualizarVacas();
+  });
+}
+
+function salvarNoBanco(obj) {
+  db.collection("gado").doc(obj.numero).set(obj);
+}
+
+function removerDoBanco(numero) {
+  db.collection("gado").doc(numero).delete();
+}
+</script>
+
+</body>
+</html>
